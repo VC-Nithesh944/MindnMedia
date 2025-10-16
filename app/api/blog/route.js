@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/config/db";
 import BlogModel from "@/lib/models/BlogModel";
 import { writeFile } from "fs/promises";
 const { NextResponse } = require("next/server");
-
+const fs = require("fs");
 //we will create api to store blog data in database, we will use model and config file
 
 const LoadDB = async () => {
@@ -56,7 +56,7 @@ export async function POST(request) {
 
   //Taking different category like authorname and store it in database
 
-    const authorImgVal = formData.get("authorImg") || "/author_img.png";
+  const authorImgVal = formData.get("authorImg") || "/author_img.png";
   const blogData = {
     title: `${formData.get("title")}`,
     description: `${formData.get("description")}`,
@@ -64,8 +64,8 @@ export async function POST(request) {
     author: `${formData.get("author")}`,
     image: `${imgUrl}`,
     authorImg: authorImgVal,
-    };
-    console.log(blogData);
+  };
+  console.log(blogData);
   //To save the data in the Database
   await BlogModel.create(blogData);
   console.log("Blog Saved");
@@ -73,4 +73,16 @@ export async function POST(request) {
   return NextResponse.json({ success: true, msg: "Blog Added Successfully" });
 
   //This API is working perfectly fine
+}
+
+//Creating API Endpoint to delete Blog
+export async function DELETE(request) {
+  //we need id, fetch from frontend
+  const id = await request.nextUrl.searchParams.get("id");
+  const blog = await BlogModel.findById(id);
+  //To delete image from public folder
+  fs.unlink(`./public/${blog.image}`, () => { });
+  await BlogModel.findByIdAndDelete(id);
+  return NextResponse.json({msg:"Blog Deleted Successfully"})
+
 }

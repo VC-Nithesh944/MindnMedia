@@ -107,7 +107,7 @@ const page = () => {
         />
         <p className="text-xl mt-4">Blog Category</p>
         <select
-          className="w-40 mt-4 py-3 px-4 border text-gray-500h"
+          className="w-40 mt-4 py-3 px-4 border text-gray-500h cursor-pointer"
           name="category"
           onChange={onChangeHandler}
           value={data.category}>
@@ -116,7 +116,9 @@ const page = () => {
           <option value="LifeStyle">LifeStyle</option>
         </select>
         <br />
-        <button type="submit" className="mt-8 w-40 h-12 bg-black text-white">
+        <button
+          type="submit"
+          className="mt-8 w-40 h-12 bg-black text-white cursor-pointer">
           ADD BLOG
         </button>
       </form>

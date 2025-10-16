@@ -75,60 +75,9 @@ const page = ({ params }) => {
           alt="main_img"
           className="border-4 border-white"
         />
-        <h1 className="my-8 text-[26px] font-semibold">Introduction: </h1>
+
         <p>{data.description}</p>
-        <h3 className="my-5 text-[18px] font-semibold">
-          Step1: Self-Reflection and Goal Setting
-        </h3>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
-        <h3 className="my-5 text-[18px] font-semibold">
-          Step1: Self-Reflection and Goal Setting
-        </h3>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
-        <h3 className="my-5 text-[18px] font-semibold">
-          Step1: Self-Reflection and Goal Setting
-        </h3>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
-        <h3 className="my-5 text-[18px] font-semibold">Conclusion</h3>
-        <p className="my-3">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum ea
-          non quibusdam porro hic aspernatur nulla. Architecto, ab odio beatae
-          labore officiis recusandae amet maxime quaerat ipsa. Quae, incidunt
-          consectetur.
-        </p>
+        
         <div className="my-24">
           <p className="text-black font font-semibold my-4">
             Share this Article on Social Media
