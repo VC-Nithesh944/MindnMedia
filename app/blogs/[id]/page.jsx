@@ -1,6 +1,7 @@
 "use client";
 import { assets, blog_data } from "@/assets/assets";
 import Footer from "@/components/Footer";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -8,17 +9,23 @@ import React, { useEffect, useState } from "react";
 const page = ({ params }) => {
   const [data, setData] = useState(null);
 
-  const fetchBlogData = () => {
-    for (let i = 0; i < blog_data.length; i++) {
-      {
-        /* Params.id is a string and the other is number, so covert to same */
-      }
-      if (Number(params.id) === blog_data[i].id) {
-        setData(blog_data[i]);
-        console.log(blog_data[i]);
-        break;
-      }
-    }
+  const fetchBlogData = async () => {
+    // for (let i = 0; i < blog_data.length; i++) {
+    //   {
+    //     /* Params.id is a string and the other is number, so covert to same */
+    //   }
+    //   if (Number(params.id) === blog_data[i].id) {
+    //     setData(blog_data[i]);
+    //     console.log(blog_data[i]);
+    //     break;
+    //   }
+    // }
+
+    const response = await axios.get("/api/blog", {
+      params: { id: params.id },
+    });
+    console.log(response.data);
+    setData(response.data);
   };
   {
     /* To use useEffect we have declare it as client */
@@ -49,7 +56,7 @@ const page = ({ params }) => {
             {data.title}
           </h1>
           <Image
-            src={data.author_img}
+            src={data.authorImg}
             width={60}
             height={60}
             alt="main_img"

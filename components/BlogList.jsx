@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BlogItem from "./BlogItem";
 import { blog_data } from "@/assets/assets";
+import axios from "axios";
 
 const BlogList = () => {
   //When i click on category it should display only that category, for lets create a state variable (We will use filter method in map context of blogdata)
   const [menu, setMenu] = useState("All");
 
+  //We will not be using blog_data import anymore, rather we will hit the api and store the blog data into a state variable and then display it as we did for this
+  const [blogs, setBlogs] = useState([]);
+
+  //function to fetchBlogs to hit the api
+  const fetchBlogs = async () => {
+    const response = await axios.get("/api/blog");
+    setBlogs(response.data.blogs);
+
+    //to test whether the data is getting saved or not
+    console.log(response.data.blogs);
+    //blogs array will be stored in Blogs state
+  };
+
+  //whenever this component gets loaded we need to run this function
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
   return (
     <div>
       <div className="flex justify-center gap-6 my-10">
@@ -43,13 +61,13 @@ const BlogList = () => {
         </button>
       </div>
       <div className="flex flex-wrap justify-around gap-1 gap-y-10 mb-16 xl:mx-24 ">
-        {blog_data
+        {blogs
           .filter((item) => (menu === "All" ? true : item.category === menu))
           .map((item, index) => {
             return (
               <BlogItem
                 key={index}
-                id={item.id}
+                id={item._id} //change id to _id
                 title={item.title}
                 description={item.description}
                 category={item.category}
@@ -61,5 +79,7 @@ const BlogList = () => {
     </div>
   );
 };
+
+//But when i click on the Blog, it will not show the page, because we are fetching data based on id (blog_data) and here we are passing object Id in the blogs\[id]. 
 
 export default BlogList;
