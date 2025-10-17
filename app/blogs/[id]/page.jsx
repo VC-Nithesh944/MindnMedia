@@ -75,9 +75,9 @@ const page = ({ params }) => {
           alt="main_img"
           className="border-4 border-white"
         />
-
-        <p>{data.description}</p>
-        
+        <div
+          className="blog-content"
+          dangerouslySetInnerHTML={{ __html: data.description }}></div>
         <div className="my-24">
           <p className="text-black font font-semibold my-4">
             Share this Article on Social Media

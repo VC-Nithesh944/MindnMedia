@@ -101,7 +101,7 @@ const page = () => {
           value={data.description}
           className="w-full sm:w-[500px] mt-4 px-4 py-3 border "
           type="text"
-          placeholder="Write Your Content Here..."
+          placeholder="Write Your Content Here... Use html tags for designing: <h1>, <h2>, <h3> for heading, <p> for paragraphs and so on....."
           rows={6}
           required
         />
