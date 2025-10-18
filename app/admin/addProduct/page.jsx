@@ -42,7 +42,7 @@ const page = () => {
           title: "",
           description: "",
           category: "Startup",
-          author: "ALex Bennett",
+          author: "VC Nithesh",
           authorImg: "/author_img.png",
         });
       } else {

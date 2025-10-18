@@ -3,15 +3,20 @@
 
 import { connectDB } from "@/lib/config/db";
 import BlogModel from "@/lib/models/BlogModel";
-import { writeFile } from "fs/promises";
 const { NextResponse } = require("next/server");
-const fs = require("fs");
-//we will create api to store blog data in database, we will use model and config file
+
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const LoadDB = async () => {
   await connectDB();
 };
-
 LoadDB();
 
 //API Endpoints to get All Blogs
@@ -35,54 +40,109 @@ export async function GET(request) {
 
 //API Endpoint for Uploading Blogs
 export async function POST(request) {
-  //we will get blog data as formdata to store in db
-  const formData = await request.formData(); //from our req will be stored
+  try {
+    const formData = await request.formData();
 
-  //get time data
-  const timestamp = Date.now();
+    // Guard: ensure Cloudinary config present
+    if (
+      !process.env.CLOUDINARY_CLOUD_NAME ||
+      !process.env.CLOUDINARY_API_KEY ||
+      !process.env.CLOUDINARY_API_SECRET
+    ) {
+      console.error("Missing Cloudinary env vars.");
+      return NextResponse.json(
+        {
+          success: false,
+          msg: "Server misconfigured: missing Cloudinary env vars",
+        },
+        { status: 500 }
+      );
+    }
 
-  const image = formData.get("image"); //we will use same field name while sending image
-  //Logic to store the image in public folder for that we need convert to bytedata
-  const imageByteData = await image.arrayBuffer();
-  //we will extract the buffer from bytedata
-  const buffer = Buffer.from(imageByteData);
-  const path = `./public/${timestamp}_${image.name}`; //timestamp will make it unique
-  await writeFile(path, buffer);
+    const image = formData.get("image"); // can be File or string path/url
+    let imgUrl = "";
 
-  const imgUrl = `/${timestamp}_${image.name}`;
+    if (image && typeof image === "object" && image.name) {
+      // File object -> upload to Cloudinary and save secure_url
+      const buffer = Buffer.from(await image.arrayBuffer());
 
-  //To test this function
-  //console.log(imgUrl);
+      const uploadFromBuffer = (buffer) =>
+        new Promise((resolve, reject) => {
+          const folder = process.env.CLOUDINARY_FOLDER || "mindnmedia";
+          try {
+            const stream = cloudinary.uploader.upload_stream(
+              { folder, resource_type: "auto" },
+              (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+              }
+            );
+            streamifier.createReadStream(buffer).pipe(stream);
+          } catch (err) {
+            reject(err);
+          }
+        });
 
-  //Taking different category like authorname and store it in database
+      try {
+        const result = await uploadFromBuffer(buffer);
+        imgUrl = result.secure_url; // Cloudinary public URL (use as-is)
+      } catch (uploadErr) {
+        console.error("Cloudinary upload error:", uploadErr);
+        return NextResponse.json(
+          {
+            success: false,
+            msg: "Image upload failed",
+            error: String(uploadErr),
+          },
+          { status: 500 }
+        );
+      }
+    } else if (image && typeof image === "string") {
+      // string URL provided by client -> save it unchanged
+      imgUrl = image;
+    } else {
+      imgUrl = ""; // no image provided
+    }
 
-  const authorImgVal = formData.get("authorImg") || "/author_img.png";
-  const blogData = {
-    title: `${formData.get("title")}`,
-    description: `${formData.get("description")}`,
-    category: `${formData.get("category")}`,
-    author: `${formData.get("author")}`,
-    image: `${imgUrl}`,
-    authorImg: authorImgVal,
-  };
-  console.log(blogData);
-  //To save the data in the Database
-  await BlogModel.create(blogData);
-  console.log("Blog Saved");
+    const authorImgVal = formData.get("authorImg") || "/author_img.png";
 
-  return NextResponse.json({ success: true, msg: "Blog Added Successfully" });
+    const blogData = {
+      title: `${formData.get("title") || ""}`,
+      description: `${formData.get("description") || ""}`,
+      category: `${formData.get("category") || ""}`,
+      author: `${formData.get("author") || ""}`,
+      image: imgUrl,
+      authorImg: authorImgVal,
+    };
 
-  //This API is working perfectly fine
+    console.log("blogData to save:", blogData);
+    await BlogModel.create(blogData);
+
+    return NextResponse.json({
+      success: true,
+      msg: "Blog Added Successfully",
+      blog: blogData,
+    });
+  } catch (err) {
+    console.error("POST /api/blog error:", err);
+    return NextResponse.json(
+      { success: false, msg: "Server error", error: String(err) },
+      { status: 500 }
+    );
+  }
 }
 
 //Creating API Endpoint to delete Blog
 export async function DELETE(request) {
-  //we need id, fetch from frontend
-  const id = await request.nextUrl.searchParams.get("id");
-  const blog = await BlogModel.findById(id);
-  //To delete image from public folder
-  fs.unlink(`./public/${blog.image}`, () => { });
-  await BlogModel.findByIdAndDelete(id);
-  return NextResponse.json({msg:"Blog Deleted Successfully"})
-
+  try {
+    const id = request.nextUrl.searchParams.get("id");
+    await BlogModel.findByIdAndDelete(id);
+    return NextResponse.json({ msg: "Blog Deleted Successfully" });
+  } catch (err) {
+    console.error("DELETE /api/blog error:", err);
+    return NextResponse.json(
+      { success: false, msg: "Server error" },
+      { status: 500 }
+    );
+  }
 }
