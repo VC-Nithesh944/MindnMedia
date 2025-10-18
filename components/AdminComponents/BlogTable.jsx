@@ -14,6 +14,7 @@ const BlogTable = ({ authorImg, title, author, date, deleteBlog, mongoId }) => {
           width={40}
           height={40}
           src={authorImg ? authorImg : assets.profile_icon}
+          className="rounded-full"
         />
         <p>{author ? author : "No Author"}</p>
       </th>
